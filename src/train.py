@@ -14,7 +14,7 @@ def train_model(data_path):
     df = preprocess_pipeline(data_path)
 
     X = df.drop('Price', axis=1)
-    y = df['Price']
+    y = df['Demand']
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
@@ -43,8 +43,8 @@ def train_model(data_path):
     print("RMSE:", rmse)
     print("R2:", r2)
 
-    joblib.dump(model, "models/model.pkl")
-    joblib.dump(scaler, "models/scaler.pkl")
+    joblib.dump(model, "models/demand_model.pkl")
+    joblib.dump(scaler, "models/demand_scaler.pkl")
 
     return model
 if __name__ == "__main__":

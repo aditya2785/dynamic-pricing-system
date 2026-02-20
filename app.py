@@ -9,8 +9,8 @@ from src.optimizer import optimize_prices
 app = Flask(__name__)
 
 # Load model and scaler
-model = joblib.load("models/model.pkl")
-scaler = joblib.load("models/scaler.pkl")
+model = joblib.load("models/demand_model.pkl")
+scaler = joblib.load("models/demand_scaler.pkl")
 
 
 @app.route("/", methods=["GET"])
@@ -21,22 +21,25 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        data = request.json
-
-        if "features" not in data:
-            return jsonify({"error": "Missing 'features' in request"}), 400
+        print("Raw JSON received:", request.get_data())
+        data = request.get_json(force=True)
+        print("Parsed JSON:", data)
 
         features = np.array(data["features"]).reshape(1, -1)
+        feature_names = data["feature_names"]
 
-        features = scaler.transform(features)
-        predicted_price = model.predict(features)[0]
+        scaled_features = scaler.transform(features)
+        predicted_demand = model.predict(scaled_features)[0]
 
         optimization_result = optimize_prices(
-            np.array([predicted_price])
+            model=model,
+            scaler=scaler,
+            base_features=features,
+            feature_names=feature_names
         )
 
         return jsonify({
-            "predicted_price": float(predicted_price),
+            "predicted_demand": float(predicted_demand),
             "optimization": optimization_result
         })
 
@@ -45,7 +48,7 @@ def predict():
 
 @app.route("/dashboard")
 def dashboard():
-    return render_template("index.html")
+    return render_template("main.html")
 
 
 

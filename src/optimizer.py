@@ -1,16 +1,36 @@
 import numpy as np
 
-def optimize_prices(predicted_prices):
+def optimize_prices(model, scaler, base_features, feature_names, cost=4000):
 
-    revenue_before = float(np.sum(predicted_prices))
+    price_index = feature_names.index("Price")
 
-    optimized_prices = predicted_prices * 1.1 
+    best_profit = -np.inf
+    best_price = None
+    best_demand = None
 
-    revenue_after = float(np.sum(optimized_prices))
+    original_price = base_features[0][price_index]
+
+    price_range = np.linspace(original_price * 0.8,
+                              original_price * 1.3,
+                              30)
+
+    for p in price_range:
+
+        test_features = base_features.copy()
+        test_features[0][price_index] = p
+
+        scaled = scaler.transform(test_features)
+        predicted_demand = model.predict(scaled)[0]
+
+        profit = (p - cost) * predicted_demand
+
+        if profit > best_profit:
+            best_profit = profit
+            best_price = p
+            best_demand = predicted_demand
 
     return {
-        "revenue_before": revenue_before,
-        "revenue_after": revenue_after,
-        "improvement_percent": 
-            float(((revenue_after - revenue_before) / revenue_before)) * 100
+        "optimal_price": float(best_price),
+        "expected_demand": float(best_demand),
+        "max_profit": float(best_profit)
     }

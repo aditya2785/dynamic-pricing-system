@@ -76,5 +76,23 @@ def preprocess_pipeline(filepath):
     df.drop(['Airline-Name','Class','Route'], axis=1, inplace=True)
 
     df = encode_data(df)
+    df = generate_synthetic_demand(df)
+    return df
+
+
+def generate_synthetic_demand(df):
+    np.random.seed(42)
+
+    base_demand = 200
+
+    price_effect = -0.02 * df['Price']
+    urgency_effect = 3 * (30 - df['days_before_flight'])
+    stop_effect = df.get('Stops_non-stop', 0) * 40
+
+    noise = np.random.normal(0, 15, len(df))
+
+    df['Demand'] = base_demand + price_effect + urgency_effect + stop_effect + noise
+
+    df['Demand'] = df['Demand'].apply(lambda x: max(5, x))
 
     return df

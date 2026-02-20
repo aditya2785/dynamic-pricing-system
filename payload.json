@@ -1,0 +1,15 @@
+{
+  "features": [10,8000,20,15,1,14,16,1,0,0.14],
+  "feature_names": [
+    "Duration",
+    "Price",
+    "days_before_flight",
+    "journey_day",
+    "arrival_category",
+    "Departure_Time_hr",
+    "Arrival_Time_hr",
+    "Stops_1-stop",
+    "Stops_non-stop",
+    "journey_day_name_FreqEnc"
+  ]
+}
